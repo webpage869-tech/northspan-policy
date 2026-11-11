@@ -34,8 +34,12 @@ jobs:
           HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           mkdir -p ~/.ssh
-          # Clean up a key pasted from Windows: drop carriage returns and stray indentation, ensure a final newline.
-          printf '%s\n' "$SSH_KEY" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sed '/^$/d' > ~/.ssh/id_deploy
+          # The secret may be the key itself, or the key as one base64 line (easier to copy without breaking it).
+          if printf '%s' "$SSH_KEY" | grep -q "BEGIN"; then
+            printf '%s\n' "$SSH_KEY" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sed '/^$/d' > ~/.ssh/id_deploy
+          else
+            printf '%s' "$SSH_KEY" | tr -d '\r\n ' | base64 -d > ~/.ssh/id_deploy
+          fi
           chmod 600 ~/.ssh/id_deploy
           ssh-keygen -y -f ~/.ssh/id_deploy > /dev/null && echo "Deploy key format OK" || { echo "DEPLOY_SSH_KEY is not a valid private key. Re-paste it, including the BEGIN and END lines."; exit 1; }
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
