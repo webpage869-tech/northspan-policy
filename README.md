@@ -25,7 +25,7 @@ The web app behind policy.northspanltd.com: create a tailored AI acceptable-use 
    - Secrets: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` (the same server and key used for Vault deploys work).
    - Variable: `DEPLOY_ENABLED` = `true` (until this is set, pushes only build and test).
 
-After that, every push to `main` builds, runs the tests, copies the code to `/opt/northspan-policy`, runs `deploy/deploy.sh`, and checks `/health`.
+After that, every push to `main` builds and tests the app, builds the Docker image on GitHub (never on the 2 GB server), loads it onto the server, copies the config to `/opt/northspan-policy`, runs `deploy/deploy.sh`, and checks `/health`. The container is capped at 256 MB so it cannot starve Vault or SQL Server.
 
 ## Never commit
 `.env`, the API key, databases, or business documents. `.gitignore` covers these.

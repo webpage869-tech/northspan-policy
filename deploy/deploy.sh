@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Runs on the Hetzner server from /opt/northspan-policy after the new code is copied in.
+# Runs on the Hetzner server from /opt/northspan-policy after GitHub Actions has
+# copied in the config files and loaded the new northspan-policy:latest image.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -8,7 +9,7 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-docker compose up -d --build --remove-orphans
+docker compose up -d --remove-orphans
 docker image prune -f >/dev/null
 
 # Wait for the app to answer its health check.

@@ -37,12 +37,21 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
-      - name: Copy code and deploy
+      # Build the image here so the small shared server never runs a .NET build.
+      - name: Build image
+        run: docker build -t northspan-policy:latest .
+      - name: Load image on server
         env:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          tar czf - --exclude=.git . | ssh -i ~/.ssh/id_deploy "$USER@$HOST" \
+          docker save northspan-policy:latest | gzip | ssh -i ~/.ssh/id_deploy "$USER@$HOST" "gunzip | docker load"
+      - name: Copy config and start
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          tar czf - docker-compose.yml .env.example deploy | ssh -i ~/.ssh/id_deploy "$USER@$HOST" \
             "mkdir -p /opt/northspan-policy && tar xzf - -C /opt/northspan-policy && chmod +x /opt/northspan-policy/deploy/deploy.sh && /opt/northspan-policy/deploy/deploy.sh"
       - name: Check public site
         run: curl -fsS --retry 5 --retry-delay 5 https://policy.northspanltd.com/health

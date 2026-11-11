@@ -1,10 +1,19 @@
 services:
   policy:
-    build: .
+    # The image is built by GitHub Actions and loaded onto the server, so the
+    # small server never has to run a .NET build next to Vault and SQL Server.
+    image: northspan-policy:latest
     container_name: northspan-policy
     restart: unless-stopped
     # ANTHROPIC_API_KEY and any overrides live in .env on the server (never in git).
     env_file: .env
+    environment:
+      # Keep the .NET runtime small on a shared 2 GB server.
+      DOTNET_gcServer: "0"
+      DOTNET_GCConserveMemory: "5"
+    # Hard cap so this app can never squeeze Vault or SQL Server for memory.
+    mem_limit: 256m
+    memswap_limit: 384m
     # Only reachable from the server itself; Nginx handles the public HTTPS side.
     ports:
       - "127.0.0.1:5081:8080"
