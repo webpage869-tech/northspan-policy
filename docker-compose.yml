@@ -1,0 +1,15 @@
+services:
+  policy:
+    build: .
+    container_name: northspan-policy
+    restart: unless-stopped
+    # ANTHROPIC_API_KEY and any overrides live in .env on the server (never in git).
+    env_file: .env
+    # Only reachable from the server itself; Nginx handles the public HTTPS side.
+    ports:
+      - "127.0.0.1:5081:8080"
+    volumes:
+      - policy-data:/app/data
+
+volumes:
+  policy-data:

@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Policy | Northspan</title>
+<meta name="description" content="Create an AI acceptable-use policy for your organization, or check your existing policy against ISO/IEC 42001 and the NIST AI RMF.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: questionnaire on the left, a live "paper" policy on the right; stacks on phones */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --paper:#ffffff; --fg:#17212b; --muted:#5b6b7a;
+  --line:#d9e0e6; --accent:#1d5d86; --accent-fg:#ffffff; --accent-soft:#e3eef5;
+  --warn-bg:#fff6e0; --warn-fg:#7a5300; --ok:#2e7d4f;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10161c; --panel:#18212a; --paper:#1d2731; --fg:#e4eaf0; --muted:#97a6b4;
+  --line:#2c3a47; --accent:#6fb1dc; --accent-fg:#0d1a24; --accent-soft:#1d3346;
+  --warn-bg:#3a2e12; --warn-fg:#f2cf7a; --ok:#6cc792; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161c; --panel:#18212a; --paper:#1d2731; --fg:#e4eaf0; --muted:#97a6b4;
+  --line:#2c3a47; --accent:#6fb1dc; --accent-fg:#0d1a24; --accent-soft:#1d3346;
+  --warn-bg:#3a2e12; --warn-fg:#f2cf7a; --ok:#6cc792; color-scheme:dark}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
+.brand{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:1.6rem;font-weight:600;margin:4px 0 0;text-wrap:balance}
+.lead{color:var(--muted);margin:4px 0 0;max-width:60ch}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;min-width:0}
+.steps{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.steps button{flex:1 1 0;min-width:64px;font:500 12px var(--sans);padding:8px 4px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;cursor:pointer}
+.steps button[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.steps button.done{color:var(--ok);border-color:var(--ok)}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:14px}
+legend{font-weight:600;font-size:1.05rem;margin-bottom:4px}
+label.f{display:grid;gap:4px;font-weight:500;font-size:14px}
+.hint{font-weight:400;color:var(--muted);font-size:13px}
+input[type=text],input[type=email],select{font:15px var(--sans);padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks{display:grid;gap:8px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{margin-top:3px;accent-color:var(--accent)}
+.toolrow{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px;align-items:center;font-size:14px}
+.toolrow input[type=text]{font-size:14px}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:20px}
+.btn{font:600 14px var(--sans);padding:10px 16px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn[disabled]{opacity:.4;cursor:default}
+.checkout{display:grid;gap:12px}
+.price{display:flex;align-items:baseline;gap:8px}
+.price b{font-size:2rem;font-weight:600}
+.note{background:var(--warn-bg);color:var(--warn-fg);border-radius:6px;padding:10px 12px;font-size:13px}
+.included{margin:0;padding-left:18px;font-size:14px;color:var(--muted)}
+/* Paper */
+.paperhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.paperhead span{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.paper{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:40px clamp(18px,5vw,56px);font-family:var(--serif);font-size:15px;line-height:1.65;position:relative;overflow:hidden;min-width:0}
+.paper h2{font-family:var(--sans);font-size:1.35rem;font-weight:600;margin:0 0 4px;text-wrap:balance}
+.paper h3{font-family:var(--sans);font-size:1rem;font-weight:600;margin:28px 0 6px}
+.paper p,.paper li{max-width:68ch}
+.paper ul,.paper ol{padding-left:22px}
+.paper .tablewrap{overflow-x:auto}
+.paper table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+.paper th,.paper td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.paper th{font-family:var(--sans);font-weight:600;background:var(--accent-soft)}
+.fill{background:var(--accent-soft);border-radius:3px;padding:0 3px}
+.locked{position:relative}
+.locked .rest{filter:blur(5px);user-select:none;pointer-events:none}
+.lockbar{position:absolute;left:0;right:0;bottom:0;padding:80px 20px 28px;text-align:center;background:linear-gradient(to bottom,transparent,var(--paper) 55%);font-family:var(--sans)}
+.lockbar p{margin:0 auto 12px;max-width:40ch;color:var(--muted)}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.modes button{display:grid;gap:2px;text-align:left;font:15px var(--sans);padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);cursor:pointer}
+.modes button span{color:var(--muted);font-size:13px}
+.modes button[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box;resize:vertical}
+.ph{font-size:1.05rem;font-weight:600;margin:0 0 4px}
+.score{display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-family:var(--sans);margin-bottom:8px}
+.ring{width:96px;height:96px;flex:none}
+.score b{font-size:1.2rem}
+.areas{display:grid;gap:6px;font-family:var(--sans);font-size:14px;margin:12px 0}
+.area{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:4px 0}
+.pill{font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px}
+.pill.ok{color:var(--ok);border:1px solid var(--ok)}
+.pill.gap{color:var(--warn-fg);background:var(--warn-bg)}
+.gapcard{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin:10px 0;font-family:var(--sans);font-size:14px}
+.gapcard h4{margin:0 0 4px;font-size:15px}
+.gapcard .std{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.offers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px;font-family:var(--sans)}
+.offer{border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:8px;align-content:start}
+.offer.main{border-color:var(--accent)}
+.offer b{font-size:1.4rem}
+.modal{position:fixed;inset:0;background:rgba(10,20,30,.55);display:grid;place-items:center;padding:16px;z-index:20}
+.modal[hidden]{display:none}
+.modalcard{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:20px;width:min(440px,100%);display:grid;gap:12px;box-sizing:border-box}
+.footer a,.hint a{color:var(--accent)}
+.footer{font-size:12px;color:var(--muted);margin-top:32px;font-family:var(--sans)}
+.copyok{font-size:13px;color:var(--ok);margin-left:8px}
+@media (prefers-reduced-motion:no-preference){.btn,.steps button{transition:background .15s,color .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brand">Northspan Ltd</div>
+      <h1>AI Acceptable-Use Policy</h1>
+      <p class="lead">Create a policy written for your organization, or check the one you already have against international standards.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge">Aligned with ISO/IEC 42001 &amp; NIST AI RMF</span></div>
+  </header>
+
+  <div class="modes" role="tablist" aria-label="Choose a path">
+    <button type="button" role="tab" id="modeCreate" aria-selected="true"><b>Create my policy</b><span>I don't have an AI policy yet</span></button>
+    <button type="button" role="tab" id="modeCheck" aria-selected="false"><b>Check my policy</b><span>I have one and want to check it</span></button>
+  </div>
+
+  <div class="grid" id="checkMode" hidden>
+    <section class="panel" aria-label="Upload your policy">
+      <h2 class="ph">Check your existing policy</h2>
+      <p class="hint" style="margin:0 0 14px">Upload a Word or text file, or paste the text. You get a free alignment score and a preview of the gaps.</p>
+      <label class="f">Upload a file<span class="hint">.docx or .txt</span><input type="file" id="upload" accept=".docx,.txt"></label>
+      <label class="f" style="margin-top:14px">Or paste your policy<textarea id="policyText" rows="12"></textarea></label>
+      <p class="hint" id="fileMsg" style="margin:6px 0 0"></p>
+      <div class="nav"><span class="hint">Your policy is checked and then discarded. We never store it. <a href="privacy.html">Privacy notice</a></span><button type="button" class="btn" id="runCheck">Check my policy</button></div>
+    </section>
+    <section aria-label="Results" style="min-width:0">
+      <div class="paperhead"><span>Results</span></div>
+      <article class="paper" id="results"></article>
+    </section>
+  </div>
+
+  <div class="grid" id="createMode">
+    <section class="panel" aria-label="Questionnaire">
+      <div class="steps" id="steps" role="tablist"></div>
+      <form id="form" novalidate>
+        <fieldset data-step="0">
+          <legend>Your organization</legend>
+          <label class="f">Organization name<input type="text" id="org" value="Harbour View Co-operative Credit Union"></label>
+          <label class="f">Country<input type="text" id="country" value="St. Kitts and Nevis"></label>
+          <label class="f">Sector
+            <select id="sector">
+              <option value="cu" selected>Credit union or co-operative</option>
+              <option value="bank">Bank or financial services</option>
+              <option value="ins">Insurance</option>
+              <option value="health">Healthcare</option>
+              <option value="retail">Retail or hospitality</option>
+              <option value="legal">Law firm</option>
+              <option value="acct">Accounting practice</option>
+              <option value="gov">Government or statutory body</option>
+              <option value="sme">Small or medium business</option>
+            </select></label>
+          <label class="f">Who do you serve?
+            <select id="audience">
+              <option value="members" selected>Members</option>
+              <option value="customers">Customers</option>
+              <option value="clients">Clients</option>
+              <option value="citizens">Citizens</option>
+            </select></label>
+          <label class="f">Number of staff
+            <select id="size">
+              <option value="s">1–20</option>
+              <option value="m" selected>21–100</option>
+              <option value="l">More than 100</option>
+            </select></label>
+        </fieldset>
+
+        <fieldset data-step="1" hidden>
+          <legend>Who owns the policy</legend>
+          <label class="f">Who approves this policy?
+            <select id="approver">
+              <option value="the Board of Directors" selected>Board of Directors</option>
+              <option value="Senior Management">Senior management</option>
+              <option value="the Owner">Owner</option>
+            </select></label>
+          <label class="f">Policy owner's job title<span class="hint">The person staff go to with questions.</span><input type="text" id="owner" value="IT Manager"></label>
+          <label class="f">Incident contact<span class="hint">Where staff report a mistake or problem.</span><input type="text" id="contact" value="it@harbourviewcu.example"></label>
+          <label class="f">Name of your disciplinary policy<input type="text" id="discipline" value="Staff Disciplinary Procedure"></label>
+          <label class="f">Review the policy every
+            <select id="review">
+              <option value="6">6 months</option>
+              <option value="12" selected>12 months</option>
+              <option value="24">24 months</option>
+            </select></label>
+        </fieldset>
+
+        <fieldset data-step="2" hidden>
+          <legend>AI tools you allow</legend>
+          <p class="hint" style="margin:0">Set the most sensitive kind of information each tool may receive. Business plans usually protect data better than free accounts.</p>
+          <div class="checks" id="tools"></div>
+          <label class="f">Another tool (optional)<input type="text" id="otherTool" placeholder="e.g. Grammarly Business"></label>
+        </fieldset>
+
+        <fieldset data-step="3" hidden>
+          <legend>Sensitive information you hold</legend>
+          <div class="checks" id="data"></div>
+        </fieldset>
+
+        <fieldset data-step="4" hidden>
+          <legend>Get your policy</legend>
+          <div class="checkout">
+            <div class="price"><b>US$49.99</b><span class="hint">one-time</span></div>
+            <ul class="included">
+              <li>Your tailored policy as an editable Word file</li>
+              <li>Approved tools register and staff acknowledgement form</li>
+              <li>Standards map to ISO/IEC 42001 and NIST AI RMF</li>
+              <li>Free edits to your answers for 30 days</li>
+            </ul>
+            <div class="note" id="payNote">We are opening sales very soon. Leave your email and we will tell you the day it launches.</div>
+            <button type="button" class="btn" id="payBtn" data-buy="create">Notify me at launch</button>
+          </div>
+        </fieldset>
+
+        <div class="nav">
+          <button type="button" class="btn ghost" id="back">Back</button>
+          <button type="button" class="btn" id="next">Next</button>
+        </div>
+      </form>
+    </section>
+
+    <section aria-label="Policy preview" style="min-width:0">
+      <div class="paperhead"><span id="previewLabel">Live preview</span><span id="copyWrap" hidden><button type="button" class="btn ghost" id="copyBtn">Copy policy text</button><span class="copyok" id="copyOk" hidden>Copied</span></span></div>
+      <article class="paper" id="paper"></article>
+    </section>
+  </div>
+  <p class="footer">© 2026 Northspan Ltd, St. Kitts and Nevis · <a href="terms.html">Terms of sale</a> · <a href="privacy.html">Privacy notice</a> · info@northspanltd.com · General guidance, not legal advice.</p>
+
+<div class="modal" id="notify" hidden role="dialog" aria-modal="true" aria-labelledby="notifyTitle">
+  <form class="modalcard" id="notifyForm" novalidate>
+    <h2 class="ph" id="notifyTitle">Get notified at launch</h2>
+    <p class="hint" id="notifyWhat" style="margin:0"></p>
+    <label class="f">Business email<input type="email" id="nEmail" autocomplete="email" required></label>
+    <label class="f">Organization (optional)<input type="text" id="nOrg" autocomplete="organization"></label>
+    <label class="check"><input type="checkbox" id="nMarketing"><span>Also send me occasional updates on AI governance from Northspan.</span></label>
+    <p class="hint" id="nMsg" role="status" style="margin:0"></p>
+    <div class="nav" style="margin-top:4px"><button type="button" class="btn ghost" id="nCancel">Close</button><button type="submit" class="btn" id="nSubmit">Notify me</button></div>
+  </form>
+</div>
+</div>
+
+<script>
+
+const STEPS=["Organization","Ownership","AI tools","Data","Checkout"];
+const LEVELS=["Not allowed","Public","Internal","Confidential"];
+const TOOLS=[
+  {id:"copilot",name:"Microsoft 365 Copilot (business)",lvl:3},
+  {id:"chatgpt",name:"ChatGPT",lvl:1},
+  {id:"gemini",name:"Google Gemini",lvl:0},
+  {id:"claude",name:"Claude",lvl:0}
+];
+const DATA=[
+  {id:"fin",label:"Account numbers, balances, loans or transactions",on:true,
+   rule:"Account numbers, card numbers, loan details, balances or transaction histories"},
+  {id:"ids",label:"Government ID numbers",on:true,
+   rule:"Government ID numbers, such as social security, passport or driver's licence numbers"},
+  {id:"health",label:"Health or medical information",on:false,
+   rule:"Health, medical or insurance claim information about any person"},
+  {id:"legal",label:"Legal matters or privileged advice",on:true,
+   rule:"Legal advice, litigation files or regulatory correspondence"},
+  {id:"kids",label:"Information about children",on:false,
+   rule:"Any information about children, including junior account holders or students"}
+];
+const SECTOR={
+  cu:{ok:["Drafting member newsletters and notices for review","Summarizing board policy drafts that contain no member data"],
+      no:["Assessing loan applications or creditworthiness with AI alone","Entering member account details into any AI tool"],
+      reg:"the Financial Services Regulatory Commission and any data protection law in force"},
+  bank:{ok:["Drafting customer notices and product summaries for review","Summarizing published regulatory guidance"],
+        no:["Approving credit, accounts or transactions with AI alone","Entering customer account or KYC details into unapproved tools"],
+        reg:"your central bank or financial regulator, anti-money-laundering rules and any data protection law in force"},
+  health:{ok:["Drafting patient leaflets and appointment reminders for review","Summarizing published clinical guidelines"],
+          no:["Making diagnosis or treatment decisions with AI alone","Entering patient records into unapproved tools"],
+          reg:"health professional regulations, patient confidentiality rules and any data protection law in force"},
+  retail:{ok:["Writing product descriptions and menus","Drafting social media posts for review"],
+          no:["Entering customer payment card details into any AI tool","Publishing AI-generated reviews or testimonials"],
+          reg:"any data protection and consumer protection law in force"},
+  ins:{ok:["Drafting policyholder letters for review","Summarizing public product information"],
+       no:["Deciding claims or premiums with AI alone","Uploading claim files to unapproved tools"],
+       reg:"your insurance regulator and any data protection law in force"},
+  legal:{ok:["Drafting first versions of routine letters for lawyer review","Summarizing published case law"],
+         no:["Entering privileged client information into unapproved tools","Filing AI-drafted documents without lawyer review"],
+         reg:"your bar association's rules and any data protection law in force"},
+  acct:{ok:["Explaining accounting standards to staff","Drafting engagement letters for review"],
+        no:["Uploading client financial statements to unapproved tools","Signing off figures produced by AI without checking"],
+        reg:"your professional body's code of ethics and any data protection law in force"},
+  gov:{ok:["Drafting public notices for review","Summarizing published legislation"],
+       no:["Making decisions on benefits, permits or licences with AI alone","Entering citizen records into unapproved tools"],
+       reg:"public service rules, records legislation and any data protection law in force"},
+  sme:{ok:["Drafting marketing copy and social posts","Writing first versions of quotes and proposals"],
+       no:["Entering customer payment details into any AI tool","Publishing AI-written content without checking it"],
+       reg:"any data protection and consumer protection law in force"}
+};
+
+let step=0, unlocked=false;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f=s=>`<span class="fill">${esc(s)}</span>`;
+
+// Build dynamic inputs
+$("tools").innerHTML=TOOLS.map(t=>`<div class="toolrow"><label for="t_${t.id}">${t.name}</label><select id="t_${t.id}">${LEVELS.map((l,i)=>`<option value="${i}"${i===t.lvl?" selected":""}>${l}</option>`).join("")}</select></div>`).join("");
+$("data").innerHTML=DATA.map(d=>`<label class="check"><input type="checkbox" id="d_${d.id}"${d.on?" checked":""}><span>${d.label}</span></label>`).join("");
+$("steps").innerHTML=STEPS.map((s,i)=>`<button type="button" role="tab" data-i="${i}">${s}</button>`).join("");
+
+function answers(){
+  const v=id=>$(id).value.trim();
+  const tools=TOOLS.map(t=>({name:t.name,lvl:+$("t_"+t.id).value})).filter(t=>t.lvl>0);
+  if(v("otherTool")) tools.push({name:v("otherTool"),lvl:1});
+  return {org:v("org")||"[ORGANIZATION NAME]",country:v("country")||"[COUNTRY]",sector:v("sector"),
+    aud:v("audience"),size:v("size"),approver:v("approver"),owner:v("owner")||"[POLICY OWNER]",
+    contact:v("contact")||"[CONTACT]",discipline:v("discipline")||"[DISCIPLINARY POLICY]",review:v("review"),
+    tools,data:DATA.filter(d=>$("d_"+d.id).checked)};
+}
+
+function policy(a){
+  const s=SECTOR[a.sector], A=a.aud;
+  const levelName=i=>LEVELS[i];
+  const toolRows=a.tools.length?a.tools.map(t=>`<tr><td>${esc(t.name)}</td><td>${levelName(t.lvl)}</td><td>${f(a.owner)}</td></tr>`).join("")
+    :`<tr><td colspan="3">No tools approved yet. Use the request process in Section 7.</td></tr>`;
+  const train=a.size==="s"?"when they join":"when they join and once a year after that";
+  const head=`
+  <h2>${f(a.org)}<br>Artificial Intelligence Acceptable-Use Policy</h2>
+  <div class="tablewrap"><table><tbody>
+   <tr><th>Policy owner</th><td>${f(a.owner)}</td><th>Approved by</th><td>${f(cap(a.approver))}</td></tr>
+   <tr><th>Applies in</th><td>${f(a.country)}</td><th>Review every</th><td>${f(a.review+" months")}</td></tr>
+  </tbody></table></div>
+  <h3>1. Purpose</h3>
+  <p>This policy sets the rules for using artificial intelligence (AI) tools at ${f(a.org)}. AI can help staff work faster. It can also expose the personal data of our ${f(A)}, produce wrong answers, and create legal and reputational risk. This policy lets staff use AI where it helps while keeping people responsible for every decision.</p>
+  <h3>2. Scope</h3>
+  <p>It applies to all employees, managers, directors, committee members, contractors and volunteers. It covers any AI tool used for ${f(a.org)} work, on any device, including AI features built into email, documents and meeting software.</p>`;
+  const rest=`
+  <h3>3. Guiding principles</h3>
+  <ol><li><b>Protect data first.</b> Only put information into a tool rated for it.</li>
+  <li><b>People stay accountable.</b> You are responsible for work produced with AI help.</li>
+  <li><b>Check before you trust.</b> Verify facts, figures and names.</li>
+  <li><b>Be fair.</b> Never use AI in ways that could treat any of our ${f(A)} unfairly.</li>
+  <li><b>Use approved tools only.</b> See the register below.</li></ol>
+  <h3>4. Approved tools and data levels</h3>
+  <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Most sensitive data allowed</th><th>Approved by</th></tr></thead><tbody>${toolRows}</tbody></table></div>
+  <p>Public means already published. Internal means everyday non-sensitive material. Confidential means financial results, contracts, plans and staff matters. Restricted information, listed in Section 5, never goes into any AI tool without written approval from the ${f(a.owner)}.</p>
+  <h3>5. Information that must never be entered</h3>
+  <ul><li>Names, addresses, phone numbers or photos of our ${f(A)} or staff</li>
+  ${a.data.map(d=>`<li>${f(d.rule)}</li>`).join("")}
+  <li>Passwords, PINs, security codes or system settings</li>
+  <li>Board papers, audit findings or unreleased financial results</li></ul>
+  <p>Before asking AI for help with sensitive material, remove identifying details, for example by writing “${cap(A).slice(0,-1)} A” instead of a name. Staff must also follow the rules of ${f(s.reg)}.</p>
+  <h3>6. Acceptable and unacceptable uses</h3>
+  <div class="tablewrap"><table><thead><tr><th>Acceptable, with approved tools</th><th>Not acceptable</th></tr></thead><tbody>
+   ${s.ok.map((o,i)=>`<tr><td>${f(o)}</td><td>${f(s.no[i])}</td></tr>`).join("")}
+   <tr><td>Drafting emails and reports for human review</td><td>Sending AI-written messages to ${f(A)} without review</td></tr>
+   <tr><td>Explaining procedures or software features</td><td>Creating fake or impersonating content</td></tr>
+  </tbody></table></div>
+  <h3>7. Requesting a new tool</h3>
+  <p>Send requests to the ${f(a.owner)} with the tool name, purpose and the kind of data involved. The ${f(a.owner)} checks where the vendor stores data, whether it trains on our data, and how data is deleted, then approves, sets conditions or declines within 10 working days.</p>
+  <h3>8. Human review</h3>
+  <p>AI must never be the only basis for a decision that significantly affects a person. A qualified staff member makes and records those decisions.</p>
+  <h3>9. Training, incidents and enforcement</h3>
+  <p>Staff receive AI awareness training ${f(train)}. Report any data entered into the wrong tool, or any harmful AI output, to ${f(a.contact)} straight away. Staff who report in good faith are supported. Breaches are handled under the ${f(a.discipline)}.</p>
+  <h3>10. Roles and responsibilities</h3>
+  <div class="tablewrap"><table><thead><tr><th>Role</th><th>Responsibilities</th></tr></thead><tbody>
+   <tr><td>${f(cap(a.approver))}</td><td>Approves this policy and High-risk AI uses; receives a yearly AI report.</td></tr>
+   <tr><td>${f(a.owner)}</td><td>Maintains this policy and registers, approves tools, handles incidents.</td></tr>
+   ${a.size==="s"?"":`<tr><td>Managers</td><td>Make sure teams follow this policy and record regular AI uses.</td></tr>`}
+   <tr><td>All staff</td><td>Follow this policy, complete training, report concerns.</td></tr>
+  </tbody></table></div>
+  <h3>11. AI use register and risk levels</h3>
+  <p>Every regular use of AI is recorded in an AI Use Register and given a risk level.</p>
+  <div class="tablewrap"><table><thead><tr><th>Level</th><th>Examples</th><th>Controls</th></tr></thead><tbody>
+   <tr><td>Low</td><td>Internal drafts, brainstorming</td><td>Follow this policy</td></tr>
+   <tr><td>Medium</td><td>Output sent to ${f(A)}, summaries of confidential material</td><td>Manager approval, register entry, spot checks</td></tr>
+   <tr><td>High</td><td>AI that influences decisions about people, or talks directly to ${f(A)}</td><td>Approval by ${f(a.approver)}, impact assessment, a person makes every final decision</td></tr>
+  </tbody></table></div>
+  <h3>12. Vendors and third parties</h3>
+  <p>AI vendors are checked before approval and reviewed at least yearly. Contracts should switch off training on our data, require breach notice, and delete our data when the service ends.</p>
+  <h3>13. Monitoring, records and review</h3>
+  <p>The ${f(a.owner)} keeps the registers, approvals, incident log and training records, checks a sample of Medium and High-risk uses regularly, and reports to ${f(a.approver)} each year. This policy is reviewed every ${f(a.review+" months")}, or sooner if laws or tools change.</p>
+  <h3>Standards alignment</h3>
+  <p>This policy is aligned with ISO/IEC 42001:2023 and the NIST AI Risk Management Framework 1.0. A section-by-section map is included in the Word file. Alignment is not certification.</p>
+  <h3>Staff acknowledgement</h3>
+  <p>I have read and understood the ${f(a.org)} AI Acceptable-Use Policy and agree to follow it.</p>
+  <div class="tablewrap"><table><tbody><tr><th>Name</th><td></td></tr><tr><th>Signature</th><td></td></tr><tr><th>Date</th><td></td></tr></tbody></table></div>`;
+  return unlocked?head+rest:
+    head+`<div class="locked"><div class="rest">${rest}</div><div class="lockbar"><p>Sections 3 to 13, your tools register, standards map and staff form unlock after checkout.</p><button type="button" class="btn" onclick="go(4)">Go to checkout</button></div></div>`;
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function render(){
+  document.querySelectorAll("fieldset").forEach(fs=>fs.hidden=+fs.dataset.step!==step);
+  document.querySelectorAll("#steps button").forEach((b,i)=>{
+    b.toggleAttribute("aria-current",false); if(i===step) b.setAttribute("aria-current","step");
+    b.classList.toggle("done",i<step);
+  });
+  $("back").disabled=step===0;
+  $("next").hidden=step===STEPS.length-1;
+  $("paper").innerHTML=policy(answers());
+  $("previewLabel").textContent=unlocked?"Your policy":"Live preview";
+  $("copyWrap").hidden=!unlocked;
+
+}
+function go(i){step=Math.max(0,Math.min(STEPS.length-1,i));render();}
+$("next").onclick=()=>go(step+1);
+$("back").onclick=()=>go(step-1);
+$("steps").onclick=e=>{const b=e.target.closest("button");if(b)go(+b.dataset.i);};
+$("form").addEventListener("input",render);
+$("form").addEventListener("submit",e=>e.preventDefault());
+$("copyBtn").onclick=()=>{
+  const t=$("paper").innerText;
+  const ok=()=>{$("copyOk").hidden=false;setTimeout(()=>$("copyOk").hidden=true,2000)};
+  try{navigator.clipboard.writeText(t).then(ok,()=>sel());}catch(e){sel();}
+  function sel(){const r=document.createRange();r.selectNodeContents($("paper"));const s=getSelection();s.removeAllRanges();s.addRange(r);}
+};
+render();
+
+// ================= Mode switch =================
+function setMode(m){
+  $("createMode").hidden=m!=="create"; $("checkMode").hidden=m!=="check";
+  $("modeCreate").setAttribute("aria-selected",m==="create"); $("modeCheck").setAttribute("aria-selected",m==="check");
+  try{history.replaceState(null,"",m==="check"?"#check":"#create");}catch(e){}
+}
+$("modeCreate").onclick=()=>setMode("create");
+$("modeCheck").onclick=()=>setMode("check");
+if(location.hash==="#check") setMode("check");
+
+// ================= Check my policy (calls the server) =================
+function ring(pct){
+  const r=40,c=2*Math.PI*r,col=pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--warn-fg)";
+  return `<svg class="ring" viewBox="0 0 96 96" role="img" aria-label="${pct}% aligned"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c*pct/100} ${c}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="600" fill="var(--fg)">${pct}%</text></svg>`;
+}
+function emptyResults(){
+  $("results").innerHTML=`<div style="font-family:var(--sans)"><h3 style="margin-top:0">What you'll get</h3>
+   <ul><li>An alignment score against 15 requirements from ISO/IEC 42001 and the NIST AI RMF</li>
+   <li>Which areas of your policy are covered and which have gaps</li>
+   <li>The first two gaps explained, with the standard each one relates to</li></ul>
+   <p class="hint">The check takes about 20 seconds. Remove names, account numbers and other personal details before uploading.</p></div>`;
+}
+function showResults(r){
+  const areas=r.areas.map(a=>`<div class="area"><span>${esc(a.area)}</span>${a.gaps?`<span class="pill gap">${a.gaps} gap${a.gaps>1?"s":""}</span>`:`<span class="pill ok">Covered</span>`}</div>`).join("");
+  const shown=r.gaps.map(g=>`<div class="gapcard"><h4>${esc(g.title)}${g.status==="partial"?" (partly covered)":""}</h4><div>${esc(g.why)}</div>${g.note?`<div style="margin-top:4px"><b>In your policy:</b> ${esc(g.note)}</div>`:""}<div class="std">${esc(g.standard)}</div></div>`).join("");
+  const totalGaps=r.gaps.length+r.hiddenGaps;
+  $("results").innerHTML=`
+   <div class="score">${ring(r.scorePercent)}<div><b>${r.scorePercent}% aligned</b><br><span class="hint">${r.met} of ${r.total} requirements fully covered${r.partial?`, ${r.partial} partly`:""} · ISO/IEC 42001 and NIST AI RMF</span></div></div>
+   <div class="areas">${areas}</div>
+   ${totalGaps?`<h3>Gaps found</h3>${shown}
+   ${r.hiddenGaps>0?`<div class="gapcard" style="text-align:center"><b>${r.hiddenGaps} more gap${r.hiddenGaps>1?"s":""}</b> are explained in the full report, with the standard each one relates to.</div>`:""}
+   <div class="offers">
+     <div class="offer"><span class="hint">Full gap report</span><b>US$39.99</b><span class="hint">Every gap, why it matters, and the clause it relates to.</span><button type="button" class="btn ghost" data-buy="report">Notify me at launch</button></div>
+     <div class="offer main"><span class="hint">Updated policy</span><b>US$49.99</b><span class="hint">Keeps your good wording and adds what is missing, as a Word file. Bought the report first? Upgrade for US$10.</span><button type="button" class="btn" data-buy="fix">Notify me at launch</button></div>
+   </div>`:`<h3>No gaps found</h3><p>Your policy covers every requirement we check.</p>`}
+   <p class="hint" style="font-family:var(--sans);margin-top:16px">Automated check, for guidance only. It does not certify your organization against any standard.</p>`;
+}
+async function runCheck(){
+  const file=$("upload").files[0], text=$("policyText").value.trim();
+  if(!file && text.length<200){$("fileMsg").textContent="Upload your policy or paste at least a few paragraphs.";return;}
+  const fd=new FormData();
+  if(file) fd.append("file",file); else fd.append("text",text);
+  const btn=$("runCheck"); btn.disabled=true; btn.textContent="Checking…";
+  $("fileMsg").textContent=""; $("results").innerHTML=`<p style="font-family:var(--sans)">Reading your policy against the checklist. This takes about 20 seconds…</p>`;
+  try{
+    const res=await fetch("/api/check",{method:"POST",body:fd});
+    const data=await res.json().catch(()=>({}));
+    if(res.status===429) throw new Error("You've run several checks in the last hour. Please try again later.");
+    if(!res.ok) throw new Error(data.error||"The check could not be completed. Please try again.");
+    showResults(data);
+  }catch(err){
+    $("results").innerHTML=`<p style="font-family:var(--sans)">${esc(err.message)}</p>`;
+  }finally{ btn.disabled=false; btn.textContent="Check my policy"; }
+}
+$("runCheck").onclick=runCheck;
+$("upload").onchange=()=>{const f=$("upload").files[0];$("fileMsg").textContent=f?`Ready to check ${f.name}.`:"";};
+emptyResults();
+
+// ================= Notify me (soft launch) =================
+const INTEREST={create:"the tailored AI policy (US$49.99)",report:"the full gap report (US$39.99)",fix:"the updated policy (US$49.99)"};
+let interest="create";
+function openNotify(kind){
+  interest=kind; $("notifyWhat").textContent=`We'll email you once ${INTEREST[kind]} is available to buy.`;
+  $("nMsg").textContent=""; $("nSubmit").disabled=false; $("notify").hidden=false; $("nEmail").focus();
+}
+function closeNotify(){ $("notify").hidden=true; }
+document.addEventListener("click",e=>{const b=e.target.closest("[data-buy]"); if(b) openNotify(b.dataset.buy);});
+$("nCancel").onclick=closeNotify;
+$("notify").addEventListener("click",e=>{ if(e.target===$("notify")) closeNotify(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("notify").hidden) closeNotify(); });
+$("notifyForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=$("nEmail").value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ $("nMsg").textContent="Enter a valid email address."; return; }
+  $("nSubmit").disabled=true;
+  try{
+    const res=await fetch("/api/waitlist",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email,organization:$("nOrg").value.trim()||null,interest,marketingOk:$("nMarketing").checked})});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error||"Something went wrong. Please try again.");
+    $("nMsg").textContent=data.added?"You're on the list. We'll be in touch.":"You're already on the list for this.";
+  }catch(err){ $("nMsg").textContent=err.message; $("nSubmit").disabled=false; }
+});
+</script>
+</body>
+</html>

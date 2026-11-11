@@ -1,0 +1,28 @@
+# Secrets and local data — never commit
+.env
+*.env
+!.env.example
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Build output
+bin/
+obj/
+publish/
+TestResults/
+
+# Editors and OS
+.vs/
+.vscode/
+.idea/
+*.user
+.DS_Store
+Thumbs.db
+
+# Business documents and notes stay out of the repo
+*.docx
+*.xlsx
+*.pdf
+DEPLOYMENT_SECRETS.md

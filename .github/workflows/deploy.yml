@@ -1,0 +1,48 @@
+name: Build, test and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore tests/NorthspanPolicy.Tests/NorthspanPolicy.Tests.csproj
+      - name: Build
+        run: dotnet build tests/NorthspanPolicy.Tests/NorthspanPolicy.Tests.csproj -c Release --no-restore
+      - name: Test
+        run: dotnet test tests/NorthspanPolicy.Tests/NorthspanPolicy.Tests.csproj -c Release --no-build --verbosity normal
+
+  deploy:
+    # Deploys only after tests pass on main, and only once the repo variable DEPLOY_ENABLED is set to "true".
+    needs: build-test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+      - name: Copy code and deploy
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          tar czf - --exclude=.git . | ssh -i ~/.ssh/id_deploy "$USER@$HOST" \
+            "mkdir -p /opt/northspan-policy && tar xzf - -C /opt/northspan-policy && chmod +x /opt/northspan-policy/deploy/deploy.sh && /opt/northspan-policy/deploy/deploy.sh"
+      - name: Check public site
+        run: curl -fsS --retry 5 --retry-delay 5 https://policy.northspanltd.com/health
