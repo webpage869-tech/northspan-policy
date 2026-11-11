@@ -34,8 +34,10 @@ jobs:
           HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_deploy
+          # Clean up a key pasted from Windows: drop carriage returns and stray indentation, ensure a final newline.
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sed '/^$/d' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
+          ssh-keygen -y -f ~/.ssh/id_deploy > /dev/null && echo "Deploy key format OK" || { echo "DEPLOY_SSH_KEY is not a valid private key. Re-paste it, including the BEGIN and END lines."; exit 1; }
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
       # Build the image here so the small shared server never runs a .NET build.
       - name: Build image
