@@ -76,6 +76,11 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .locked .rest{filter:blur(5px);user-select:none;pointer-events:none}
 .lockbar{position:absolute;left:0;right:0;bottom:0;padding:80px 20px 28px;text-align:center;background:linear-gradient(to bottom,transparent,var(--paper) 55%);font-family:var(--sans)}
 .lockbar p{margin:0 auto 12px;max-width:40ch;color:var(--muted)}
+.single{max-width:780px;margin:0 auto;display:grid;gap:20px}
+.switch{margin:0}
+.linkbtn{background:none;border:0;padding:4px 0;font:500 14px var(--sans);color:var(--accent);cursor:pointer;text-align:left}
+.linkbtn:hover{text-decoration:underline}
+.createhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:8px 24px;margin-bottom:16px}
 .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px}
 .modes button{display:grid;gap:2px;text-align:left;font:15px var(--sans);padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);cursor:pointer}
 .modes button span{color:var(--muted);font-size:13px}
@@ -113,31 +118,34 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
     <div>
       <div class="brand">Northspan Ltd</div>
       <h1>AI Acceptable-Use Policy</h1>
-      <p class="lead">Create a policy written for your organization, or check the one you already have against international standards.</p>
+      <p class="lead">A clear set of rules for how your staff use AI tools like ChatGPT and Copilot, written for your organization in about 10 minutes.</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge">Aligned with ISO/IEC 42001 &amp; NIST AI RMF</span></div>
   </header>
 
-  <div class="modes" role="tablist" aria-label="Choose a path">
-    <button type="button" role="tab" id="modeCreate" aria-selected="true"><b>Create my policy</b><span>I don't have an AI policy yet</span></button>
-    <button type="button" role="tab" id="modeCheck" aria-selected="false"><b>Check my policy</b><span>I have one and want to check it</span></button>
-  </div>
 
-  <div class="grid" id="checkMode" hidden>
+  <div id="checkMode" class="single" hidden>
+    <p class="switch"><button type="button" class="linkbtn" id="toCreate">&larr; Don't have a policy yet? Create one</button></p>
     <section class="panel" aria-label="Upload your policy">
-      <h2 class="ph">Check your existing policy</h2>
-      <p class="hint" style="margin:0 0 14px">Upload a Word or text file, or paste the text. You get a free alignment score and a preview of the gaps.</p>
+      <h2 class="ph">Check your existing AI policy</h2>
+      <p class="hint" style="margin:0 0 6px">Free. You get an alignment score against 15 requirements from ISO/IEC 42001 and the NIST AI RMF, the areas that are covered, and the first two gaps explained.</p>
+      <p class="hint" style="margin:0 0 14px">Remove names, account numbers and other personal details first. The check takes about 20 seconds.</p>
       <label class="f">Upload a file<span class="hint">.docx or .txt</span><input type="file" id="upload" accept=".docx,.txt"></label>
       <label class="f" style="margin-top:14px">Or paste your policy<textarea id="policyText" rows="12"></textarea></label>
       <p class="hint" id="fileMsg" style="margin:6px 0 0"></p>
       <div class="nav"><span class="hint">Your policy is checked and then discarded. We never store it. <a href="privacy.html">Privacy notice</a></span><button type="button" class="btn" id="runCheck">Check my policy</button></div>
     </section>
-    <section aria-label="Results" style="min-width:0">
-      <div class="paperhead"><span>Results</span></div>
+    <section aria-label="Results" id="resultsWrap" style="min-width:0" hidden>
+      <div class="paperhead"><span>Your results</span></div>
       <article class="paper" id="results"></article>
     </section>
   </div>
 
+  <div id="createWrap">
+  <div class="createhead">
+    <div><h2 class="ph">Create your AI policy</h2><p class="hint" style="margin:0">Answer the questions on the left. Your policy builds on the right as you go.</p></div>
+    <button type="button" class="linkbtn" id="toCheck">Already have an AI policy? Check it free &rarr;</button>
+  </div>
   <div class="grid" id="createMode">
     <section class="panel" aria-label="Questionnaire">
       <div class="steps" id="steps" role="tablist"></div>
@@ -230,6 +238,7 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
       <div class="paperhead"><span id="previewLabel">Live preview</span><span id="copyWrap" hidden><button type="button" class="btn ghost" id="copyBtn">Copy policy text</button><span class="copyok" id="copyOk" hidden>Copied</span></span></div>
       <article class="paper" id="paper"></article>
     </section>
+  </div>
   </div>
   <p class="footer">© 2026 Northspan Ltd, St. Kitts and Nevis · <a href="terms.html">Terms of sale</a> · <a href="privacy.html">Privacy notice</a> · info@northspanltd.com · General guidance, not legal advice.</p>
 
@@ -419,12 +428,12 @@ render();
 
 // ================= Mode switch =================
 function setMode(m){
-  $("createMode").hidden=m!=="create"; $("checkMode").hidden=m!=="check";
-  $("modeCreate").setAttribute("aria-selected",m==="create"); $("modeCheck").setAttribute("aria-selected",m==="check");
-  try{history.replaceState(null,"",m==="check"?"#check":"#create");}catch(e){}
+  $("createWrap").hidden=m!=="create"; $("checkMode").hidden=m!=="check";
+  try{history.replaceState(null,"",m==="check"?"#check":location.pathname);}catch(e){}
+  window.scrollTo({top:0});
 }
-$("modeCreate").onclick=()=>setMode("create");
-$("modeCheck").onclick=()=>setMode("check");
+$("toCheck").onclick=()=>setMode("check");
+$("toCreate").onclick=()=>setMode("create");
 if(location.hash==="#check") setMode("check");
 
 // ================= Check my policy (calls the server) =================
@@ -432,17 +441,12 @@ function ring(pct){
   const r=40,c=2*Math.PI*r,col=pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--warn-fg)";
   return `<svg class="ring" viewBox="0 0 96 96" role="img" aria-label="${pct}% aligned"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c*pct/100} ${c}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="600" fill="var(--fg)">${pct}%</text></svg>`;
 }
-function emptyResults(){
-  $("results").innerHTML=`<div style="font-family:var(--sans)"><h3 style="margin-top:0">What you'll get</h3>
-   <ul><li>An alignment score against 15 requirements from ISO/IEC 42001 and the NIST AI RMF</li>
-   <li>Which areas of your policy are covered and which have gaps</li>
-   <li>The first two gaps explained, with the standard each one relates to</li></ul>
-   <p class="hint">The check takes about 20 seconds. Remove names, account numbers and other personal details before uploading.</p></div>`;
-}
+function emptyResults(){ $("resultsWrap").hidden=true; }
 function showResults(r){
   const areas=r.areas.map(a=>`<div class="area"><span>${esc(a.area)}</span>${a.gaps?`<span class="pill gap">${a.gaps} gap${a.gaps>1?"s":""}</span>`:`<span class="pill ok">Covered</span>`}</div>`).join("");
   const shown=r.gaps.map(g=>`<div class="gapcard"><h4>${esc(g.title)}${g.status==="partial"?" (partly covered)":""}</h4><div>${esc(g.why)}</div>${g.note?`<div style="margin-top:4px"><b>In your policy:</b> ${esc(g.note)}</div>`:""}<div class="std">${esc(g.standard)}</div></div>`).join("");
   const totalGaps=r.gaps.length+r.hiddenGaps;
+  $("resultsWrap").hidden=false;
   $("results").innerHTML=`
    <div class="score">${ring(r.scorePercent)}<div><b>${r.scorePercent}% aligned</b><br><span class="hint">${r.met} of ${r.total} requirements fully covered${r.partial?`, ${r.partial} partly`:""} · ISO/IEC 42001 and NIST AI RMF</span></div></div>
    <div class="areas">${areas}</div>
@@ -460,13 +464,14 @@ async function runCheck(){
   const fd=new FormData();
   if(file) fd.append("file",file); else fd.append("text",text);
   const btn=$("runCheck"); btn.disabled=true; btn.textContent="Checking…";
-  $("fileMsg").textContent=""; $("results").innerHTML=`<p style="font-family:var(--sans)">Reading your policy against the checklist. This takes about 20 seconds…</p>`;
+  $("fileMsg").textContent=""; $("resultsWrap").hidden=false; $("results").innerHTML=`<p style="font-family:var(--sans)">Reading your policy against the checklist. This takes about 20 seconds…</p>`;
   try{
     const res=await fetch("/api/check",{method:"POST",body:fd});
     const data=await res.json().catch(()=>({}));
     if(res.status===429) throw new Error("You've run several checks in the last hour. Please try again later.");
     if(!res.ok) throw new Error(data.error||"The check could not be completed. Please try again.");
     showResults(data);
+    $("resultsWrap").scrollIntoView({behavior:"smooth",block:"start"});
   }catch(err){
     $("results").innerHTML=`<p style="font-family:var(--sans)">${esc(err.message)}</p>`;
   }finally{ btn.disabled=false; btn.textContent="Check my policy"; }
