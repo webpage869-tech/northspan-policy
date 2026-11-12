@@ -23,18 +23,32 @@ internal sealed class FakeAi : IAiClient
     }
 }
 
+/// <summary>Records emails instead of sending them.</summary>
+internal sealed class FakeMail : IEmailSender
+{
+    public System.Collections.Concurrent.ConcurrentBag<OutgoingEmail> Sent { get; } = new();
+    public bool IsConfigured => true;
+    public Task SendAsync(OutgoingEmail email, CancellationToken ct = default) { Sent.Add(email); return Task.CompletedTask; }
+}
+
 public class EndpointTests : IClassFixture<EndpointTests.Factory>
 {
     public sealed class Factory : WebApplicationFactory<Program>
     {
         internal FakeAi Ai { get; } = new();
+        internal FakeMail Mail { get; } = new();
         private readonly string _db = Path.Combine(Path.GetTempPath(), $"policy-e2e-{Guid.NewGuid():N}.db");
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseSetting("Data:Path", _db);
             builder.UseSetting("Checks:DailyLimit", "1000");
-            builder.ConfigureServices(s => s.AddSingleton<IAiClient>(Ai));
+            builder.UseSetting("Notify:OwnerEmail", "owner@example.com");
+            builder.ConfigureServices(s =>
+            {
+                s.AddSingleton<IAiClient>(Ai);
+                s.AddSingleton<IEmailSender>(Mail);
+            });
         }
     }
 
@@ -92,6 +106,30 @@ public class EndpointTests : IClassFixture<EndpointTests.Factory>
 
         var bad = await client.PostAsJsonAsync("/api/waitlist", new { email = "nope", interest = "fix", marketingOk = false });
         Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
+    }
+
+    [Fact]
+    public async Task Waitlist_EmailsTheOwnerOnceForANewSignUp()
+    {
+        var client = _factory.CreateClient();
+        var email = $"notify-{Guid.NewGuid():N}@example.com";
+        var body = new { email, organization = "Demo Insurance", interest = "create", marketingOk = true };
+
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/waitlist", body)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/waitlist", body)).StatusCode); // duplicate
+
+        OutgoingEmail[] notices = [];
+        for (var i = 0; i < 50 && notices.Length == 0; i++)
+        {
+            notices = _factory.Mail.Sent.Where(m => m.Body.Contains(email)).ToArray();
+            if (notices.Length == 0) await Task.Delay(100);
+        }
+        await Task.Delay(200);
+        notices = _factory.Mail.Sent.Where(m => m.Body.Contains(email)).ToArray();
+
+        var notice = Assert.Single(notices); // owner only: visitor confirmation is off by default, and no repeat for the duplicate
+        Assert.Equal("owner@example.com", notice.To);
+        Assert.Contains("Demo Insurance", notice.Body);
     }
 
     [Fact]

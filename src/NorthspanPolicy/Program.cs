@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<AppStore>();
 builder.Services.AddHttpClient<IAiClient, AnthropicClient>(c => c.Timeout = TimeSpan.FromSeconds(90));
 builder.Services.AddTransient<PolicyChecker>();
+builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+builder.Services.AddSingleton<SignupNotifier>();
 
 builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = TextExtractor.MaxUploadBytes);
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = TextExtractor.MaxUploadBytes + 64 * 1024);
@@ -112,14 +114,17 @@ app.MapPost("/api/check", async (HttpRequest request, PolicyChecker checker, App
 }).RequireRateLimiting("check");
 
 // "Coming soon, notify me" sign-ups during the soft launch.
-app.MapPost("/api/waitlist", (WaitlistRequest req, AppStore store) =>
+app.MapPost("/api/waitlist", (WaitlistRequest req, AppStore store, SignupNotifier notifier) =>
 {
     if (!AppStore.IsValidEmail(req.Email))
         return Results.BadRequest(new { error = "Enter a valid email address." });
     if (req.Interest is not ("create" or "report" or "fix"))
         return Results.BadRequest(new { error = "Choose what you'd like to be notified about." });
+    if (req.Organization is { Length: > 200 })
+        return Results.BadRequest(new { error = "Organization name is too long." });
 
     var added = store.AddToWaitlist(req.Email!, req.Organization, req.Interest, req.MarketingOk);
+    if (added) notifier.QueueSignup(req.Email!.Trim(), req.Organization, req.Interest, req.MarketingOk);
     return Results.Ok(new { added });
 }).RequireRateLimiting("waitlist").DisableAntiforgery();
 
