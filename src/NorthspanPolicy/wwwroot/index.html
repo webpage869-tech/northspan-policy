@@ -76,6 +76,13 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .locked .rest{filter:blur(5px);user-select:none;pointer-events:none}
 .lockbar{position:absolute;left:0;right:0;bottom:0;padding:80px 20px 28px;text-align:center;background:linear-gradient(to bottom,transparent,var(--paper) 55%);font-family:var(--sans)}
 .lockbar p{margin:0 auto 12px;max-width:40ch;color:var(--muted)}
+.home{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:880px;margin:8px auto 0}
+.choice{display:grid;gap:8px;align-content:start;text-align:left;font:15px var(--sans);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;cursor:pointer}
+.choice b{font-size:1.35rem;font-weight:600}
+.choice .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.choice .cta{margin-top:8px;font-weight:600;color:var(--accent)}
+.choice.main{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.choice:hover{background:var(--accent-soft)}
 .single{max-width:780px;margin:0 auto;display:grid;gap:20px}
 .switch{margin:0}
 .linkbtn{background:none;border:0;padding:4px 0;font:500 14px var(--sans);color:var(--accent);cursor:pointer;text-align:left}
@@ -124,8 +131,23 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
   </header>
 
 
+  <section id="home" class="home" aria-label="Choose what you need">
+    <button type="button" class="choice main" id="goCreate">
+      <span class="eyebrow">I don't have an AI policy yet</span>
+      <b>Create my AI policy</b>
+      <span class="hint">Answer a few questions and get a policy written for your organization. About 10 minutes.</span>
+      <span class="cta">Start &rarr;</span>
+    </button>
+    <button type="button" class="choice" id="goCheck">
+      <span class="eyebrow">I already have one</span>
+      <b>Check my AI policy</b>
+      <span class="hint">Upload or paste your policy for a free score against ISO/IEC 42001 and the NIST AI RMF.</span>
+      <span class="cta">Check it free &rarr;</span>
+    </button>
+  </section>
+
   <div id="checkMode" class="single" hidden>
-    <p class="switch"><button type="button" class="linkbtn" id="toCreate">&larr; Don't have a policy yet? Create one</button></p>
+    <p class="switch"><button type="button" class="linkbtn" id="toCreate">&larr; Back</button></p>
     <section class="panel" aria-label="Upload your policy">
       <h2 class="ph">Check your existing AI policy</h2>
       <p class="hint" style="margin:0 0 6px">Free. You get an alignment score against 15 requirements from ISO/IEC 42001 and the NIST AI RMF, the areas that are covered, and the first two gaps explained.</p>
@@ -141,10 +163,10 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
     </section>
   </div>
 
-  <div id="createWrap">
+  <div id="createWrap" hidden>
+  <p class="switch"><button type="button" class="linkbtn" id="toCheck">&larr; Back</button></p>
   <div class="createhead">
     <div><h2 class="ph">Create your AI policy</h2><p class="hint" style="margin:0">Answer the questions on the left. Your policy builds on the right as you go.</p></div>
-    <button type="button" class="linkbtn" id="toCheck">Already have an AI policy? Check it free &rarr;</button>
   </div>
   <div class="grid" id="createMode">
     <section class="panel" aria-label="Questionnaire">
@@ -428,13 +450,15 @@ render();
 
 // ================= Mode switch =================
 function setMode(m){
-  $("createWrap").hidden=m!=="create"; $("checkMode").hidden=m!=="check";
-  try{history.replaceState(null,"",m==="check"?"#check":location.pathname);}catch(e){}
+  $("home").hidden=m!=="home"; $("createWrap").hidden=m!=="create"; $("checkMode").hidden=m!=="check";
+  try{history.replaceState(null,"",m==="home"?location.pathname:"#"+m);}catch(e){}
   window.scrollTo({top:0});
 }
-$("toCheck").onclick=()=>setMode("check");
-$("toCreate").onclick=()=>setMode("create");
-if(location.hash==="#check") setMode("check");
+$("goCreate").onclick=()=>setMode("create");
+$("goCheck").onclick=()=>setMode("check");
+$("toCheck").onclick=()=>setMode("home");
+$("toCreate").onclick=()=>setMode("home");
+setMode(location.hash==="#check"?"check":location.hash==="#create"?"create":"home");
 
 // ================= Check my policy (calls the server) =================
 function ring(pct){
