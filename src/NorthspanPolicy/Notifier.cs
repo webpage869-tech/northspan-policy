@@ -69,12 +69,18 @@ public sealed class SignupNotifier(IEmailSender sender, IConfiguration config, I
             log.LogInformation("Launch sign-up saved; email not configured, so no notice sent");
             return;
         }
+        log.LogInformation("Launch sign-up saved; sending email notice");
         _ = Task.Run(async () =>
         {
             try
             {
                 await sender.SendAsync(BuildOwnerNotice(OwnerEmail, email, organization, interest, marketingOk, DateTime.UtcNow));
-                if (SendConfirmation) await sender.SendAsync(BuildConfirmation(email, interest));
+                log.LogInformation("Sign-up email sent to the owner address");
+                if (SendConfirmation)
+                {
+                    await sender.SendAsync(BuildConfirmation(email, interest));
+                    log.LogInformation("Sign-up confirmation email sent to the visitor");
+                }
             }
             catch (Exception ex)
             {
