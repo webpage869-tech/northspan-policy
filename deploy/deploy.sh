@@ -9,6 +9,17 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+# Check .env ourselves first so a typo never makes Docker print the file (and the API key) into the deploy log.
+bad=$(grep -nvE '^[[:space:]]*(#.*)?$|^[A-Za-z_][A-Za-z0-9_]*=' .env | cut -d: -f1 | tr '\n' ' ' || true)
+if [[ -n "$bad" ]]; then
+  echo ".env has a badly formatted line (line number: $bad). Each line must look like NAME=value with no spaces in NAME." >&2
+  exit 1
+fi
+if ! grep -qE '^ANTHROPIC_API_KEY=.+' .env; then
+  echo ".env is missing the ANTHROPIC_API_KEY=... line." >&2
+  exit 1
+fi
+
 docker compose up -d --remove-orphans
 docker image prune -f >/dev/null
 
