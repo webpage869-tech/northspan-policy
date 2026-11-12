@@ -3,34 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AI Policy | Northspan</title>
+<title>PolicyKit | Northspan Ltd</title>
 <meta name="description" content="Create an AI acceptable-use policy for your organization, or check your existing policy against ISO/IEC 42001 and the NIST AI RMF.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
 /* Layout: questionnaire on the left, a live "paper" policy on the right; stacks on phones */
 :root{
-  --bg:#f3f5f7; --panel:#ffffff; --paper:#ffffff; --fg:#17212b; --muted:#5b6b7a;
-  --line:#d9e0e6; --accent:#1d5d86; --accent-fg:#ffffff; --accent-soft:#e3eef5;
-  --warn-bg:#fff6e0; --warn-fg:#7a5300; --ok:#2e7d4f;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  /* Northspan brand: Deep Navy #0A1D3A, Steel Blue #2D6CBD, Slate Gray #6B7280, Light Gray #F2F4F7, White */
+  --bg:#F2F4F7; --panel:#FFFFFF; --paper:#FFFFFF; --fg:#0A1D3A; --muted:#6B7280; --navy:#0A1D3A;
+  --line:#DCE1E8; --accent:#2D6CBD; --accent-fg:#FFFFFF; --accent-soft:#E7EEF8;
+  --warn-bg:#FFF6E0; --warn-fg:#7A5300; --ok:#2E7D4F;
+  --sans:"Inter",Arial,sans-serif;
+  --head:"Manrope","Inter",Arial,sans-serif;
+  --serif:"Inter",Arial,sans-serif;
+  --mono:"Inter",Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#10161c; --panel:#18212a; --paper:#1d2731; --fg:#e4eaf0; --muted:#97a6b4;
-  --line:#2c3a47; --accent:#6fb1dc; --accent-fg:#0d1a24; --accent-soft:#1d3346;
-  --warn-bg:#3a2e12; --warn-fg:#f2cf7a; --ok:#6cc792; color-scheme:dark}}
+  --bg:#07142A; --panel:#0D2242; --paper:#102749; --fg:#F2F4F7; --muted:#A4ADBB; --navy:#F2F4F7;
+  --line:#1F3A63; --accent:#6EA0E6; --accent-fg:#07142A; --accent-soft:#16335C;
+  --warn-bg:#3A2E12; --warn-fg:#F2CF7A; --ok:#6CC792; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#10161c; --panel:#18212a; --paper:#1d2731; --fg:#e4eaf0; --muted:#97a6b4;
-  --line:#2c3a47; --accent:#6fb1dc; --accent-fg:#0d1a24; --accent-soft:#1d3346;
-  --warn-bg:#3a2e12; --warn-fg:#f2cf7a; --ok:#6cc792; color-scheme:dark}
+  --bg:#07142A; --panel:#0D2242; --paper:#102749; --fg:#F2F4F7; --muted:#A4ADBB; --navy:#F2F4F7;
+  --line:#1F3A63; --accent:#6EA0E6; --accent-fg:#07142A; --accent-soft:#16335C;
+  --warn-bg:#3A2E12; --warn-fg:#F2CF7A; --ok:#6CC792; color-scheme:dark}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5}
 .wrap{max-width:1240px;margin:0 auto;padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
 .brand{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-h1{font-size:1.6rem;font-weight:600;margin:4px 0 0;text-wrap:balance}
+h1{font-family:var(--head);font-size:1.7rem;font-weight:700;margin:4px 0 0;text-wrap:balance}
 .lead{color:var(--muted);margin:4px 0 0;max-width:60ch}
 .badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
 .grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:24px;align-items:start}
@@ -64,7 +67,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .paperhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .paperhead span{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .paper{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:40px clamp(18px,5vw,56px);font-family:var(--serif);font-size:15px;line-height:1.65;position:relative;overflow:hidden;min-width:0}
-.paper h2{font-family:var(--sans);font-size:1.35rem;font-weight:600;margin:0 0 4px;text-wrap:balance}
+.paper h2{font-family:var(--head);font-size:1.35rem;font-weight:600;margin:0 0 4px;text-wrap:balance}
 .paper h3{font-family:var(--sans);font-size:1rem;font-weight:600;margin:28px 0 6px}
 .paper p,.paper li{max-width:68ch}
 .paper ul,.paper ol{padding-left:22px}
@@ -79,7 +82,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .lockbar p{margin:0 auto 12px;max-width:40ch;color:var(--muted)}
 .home{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:880px;margin:8px auto 0}
 .choice{display:grid;gap:8px;align-content:start;text-align:left;font:15px var(--sans);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;cursor:pointer}
-.choice b{font-size:1.35rem;font-weight:600}
+.choice b{font-family:var(--head);font-size:1.35rem;font-weight:700}
 .choice .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .choice .cta{margin-top:8px;font-weight:600;color:var(--accent)}
 .choice.main{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -94,7 +97,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .modes button span{color:var(--muted);font-size:13px}
 .modes button[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
 textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box;resize:vertical}
-.ph{font-size:1.05rem;font-weight:600;margin:0 0 4px}
+.ph{font-family:var(--head);font-size:1.1rem;font-weight:700;margin:0 0 4px}
 .score{display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-family:var(--sans);margin-bottom:8px}
 .ring{width:96px;height:96px;flex:none}
 .score b{font-size:1.2rem}
@@ -114,6 +117,8 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
 .modal[hidden]{display:none}
 .modalcard{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:20px;width:min(440px,100%);display:grid;gap:12px;box-sizing:border-box}
 .footer a,.hint a{color:var(--accent)}
+.logo{display:inline-block;margin-bottom:10px}
+.logo svg{display:block;height:34px;width:auto}
 .footer{font-size:12px;color:var(--muted);margin-top:32px;font-family:var(--sans)}
 .copyok{font-size:13px;color:var(--ok);margin-left:8px}
 @media (prefers-reduced-motion:no-preference){.btn,.steps button{transition:background .15s,color .15s}}
@@ -124,7 +129,8 @@ textarea{font:14px/1.5 var(--sans);padding:9px 10px;border:1px solid var(--line)
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="brand">Northspan Ltd</div>
+      <a class="logo" href="https://northspanltd.com" aria-label="Northspan Ltd home"><svg viewBox="0 0 790 160" role="img" aria-hidden="true"><g transform="translate(6 3)"><path d="M12 8 L42 20 L42 132 L12 144 Z" fill="var(--navy)"/><path d="M50 22 L80 52 L124 100 L124 144 L98 144 L50 92 Z" fill="#2D6CBD"/><path d="M94 20 L124 8 L124 92 L94 60 Z" fill="#2D6CBD"/></g><text x="168" y="105" font-family="Manrope, Arial, sans-serif" font-size="75" font-weight="700" fill="var(--navy)">Northspan</text><text x="622" y="105" font-family="Manrope, Arial, sans-serif" font-size="58" fill="#2D6CBD">Ltd</text></svg></a>
+      <div class="brand">PolicyKit</div>
       <h1>AI Acceptable-Use Policy</h1>
       <p class="lead">A clear set of rules for how your staff use AI tools like ChatGPT and Copilot, written for your organization in about 10 minutes.</p>
     </div>
@@ -464,7 +470,7 @@ setMode(location.hash==="#check"?"check":location.hash==="#create"?"create":"hom
 // ================= Check my policy (calls the server) =================
 function ring(pct){
   const r=40,c=2*Math.PI*r,col=pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--warn-fg)";
-  return `<svg class="ring" viewBox="0 0 96 96" role="img" aria-label="${pct}% aligned"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c*pct/100} ${c}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="600" fill="var(--fg)">${pct}%</text></svg>`;
+  return `<svg class="ring" viewBox="0 0 96 96" role="img" aria-label="${pct}% aligned"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c*pct/100} ${c}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="Manrope, Inter, Arial, sans-serif" font-size="20" font-weight="600" fill="var(--fg)">${pct}%</text></svg>`;
 }
 function emptyResults(){ $("resultsWrap").hidden=true; }
 function showResults(r){
